@@ -1,167 +1,108 @@
-num2words library - Convert numbers to words in multiple languages
-==================================================================
+====================================================
+PyPHER - Python-based PSF Homogenization kERnels
+====================================================
 
-.. image:: https://img.shields.io/pypi/v/num2words.svg
-   :target: https://pypi.python.org/pypi/num2words
+|pypi| |docs| |license| |doi| |actions|
 
-.. image:: https://travis-ci.org/savoirfairelinux/num2words.svg?branch=master
-    :target: https://travis-ci.org/savoirfairelinux/num2words
+Compute an homogenization kernel between two PSFs.
 
-.. image:: https://coveralls.io/repos/github/savoirfairelinux/num2words/badge.svg?branch=master
-    :target: https://coveralls.io/github/savoirfairelinux/num2words?branch=master
+This code is well suited for PSF matching applications in both an astronomical or microscopy context.
 
+It has been developed as part of the ESA `Euclid <http://www.cosmos.esa.int/web/euclid>`_ mission and is currently being used for multi-band photometric studies of `HST <https://www.spacetelescope.org/>`_ (visible) and `Herschel <http://www.cosmos.esa.int/web/herschel/home>`_ (IR) data.
 
-``num2words`` is a library that converts numbers like ``42`` to words like ``forty-two``.
-It supports multiple languages (see the list below for full list
-of languages) and can even generate ordinal numbers like ``forty-second``
-(although this last feature is a bit buggy for some languages at the moment).
+:Paper: http://arxiv.org/abs/1609.02006
+:Documentation: https://pypher.readthedocs.io
 
-The project is hosted on GitHub_. Contributions are welcome.
+Features
+========
 
-.. _GitHub: https://github.com/savoirfairelinux/num2words
+1. **Warp** (rotation + resampling) the PSF images (if necessary),
+2. **Filter** images in Fourier space using a regularized Wiener filter,
+3. **Produce** a homogenization kernel.
+
+**Note:** ``pypher`` needs the pixel scale information to be present in the FITS files. If not, use the provided ``addpixscl`` method to add this missing info.
+
+**Warning:** This code **does not**
+
+    * interpolate NaN values (replaced by 0 instead),
+    * center PSF images,
+    * minimize the kernel size.
+
 
 Installation
-------------
+============
 
-The easiest way to install ``num2words`` is to use pip::
+PyPHER works both with Python 2.7 and 3.X and relies on `numpy <http://www.numpy.org/>`_, `scipy <http://www.scipy.org/>`_ and `astropy <http://www.astropy.org/>`_ libraries.
 
-    pip install num2words
+Option 1: `Pip <https://pypi.python.org/pypi/pypher>`_
+------------------------------------------------------
 
-Otherwise, you can download the source package and then execute::
+.. code:: bash
 
+    pip install pypher
+
+Option 2: from `source <https://github.com/aboucaud/pypher>`_
+-------------------------------------------------------------
+
+.. code:: bash
+
+    git clone https://github.com/aboucaud/pypher
+    cd pypher
     python setup.py install
 
-The test suite in this library is new, so it's rather thin, but it can be run with::
+Option 3: from `conda-forge <https://github.com/conda-forge/pypher-feedstock>`_
+-------------------------------------------------------------------------------
 
-    python setup.py test
+.. code:: bash
 
-To run the full CI test suite which includes linting and multiple python environments::
+    conda install -c conda-forge pypher
 
-    pip install tox
-    tox
+Basic example
+=============
 
-Usage
------
-Command line::
+.. code:: bash
 
-    $ num2words 10001
-    ten thousand and one
-    $ num2words 24,120.10
-    twenty-four thousand, one hundred and twenty point one
-    $ num2words 24,120.10 -l es
-    veinticuatro mil ciento veinte punto uno
-    $num2words 2.14 -l es --to currency
-    dos euros con catorce céntimos
+    $ pypher psf_a.fits psf_b.fits kernel_a_to_b.fits -r 1.e-5
 
-In code there's only one function to use::
+This will create the desired kernel ``kernel_a_to_b.fits`` and a short
+log ``kernel_a_to_b.log`` with information about the processing.
 
-    >>> from num2words import num2words
-    >>> num2words(42)
-    forty-two
-    >>> num2words(42, to='ordinal')
-    forty-second
-    >>> num2words(42, lang='fr')
-    quarante-deux
 
-Besides the numerical argument, there are two main optional arguments, ``to:`` and ``lang:``
+Acknowledging
+=============
 
-**to:** The converter to use. Supported values are:
+If you make use of any product of this code in a scientific publication,
+please consider acknowledging the work by citing the paper using the BibTeX 
+information in the ``Cite this repository`` section at the top right of the page.
 
-* ``cardinal`` (default)
-* ``ordinal``
-* ``ordinal_num``
-* ``year``
-* ``currency``
 
-**lang:** The language in which to convert the number. Supported values are:
+.. |pypi| image:: https://img.shields.io/pypi/v/pypher.svg
+    :alt: Latest Version
+    :scale: 100%
+    :target: https://pypi.python.org/pypi/pypher
 
-* ``en`` (English, default)
-* ``am`` (Amharic)
-* ``ar`` (Arabic)
-* ``az`` (Azerbaijani)
-* ``be`` (Belarusian)
-* ``bn`` (Bangladeshi)
-* ``ca`` (Catalan)
-* ``ce`` (Chechen)
-* ``cs`` (Czech)
-* ``cy`` (Welsh)
-* ``da`` (Danish)
-* ``de`` (German)
-* ``en_GB`` (English - Great Britain)
-* ``en_IN`` (English - India)
-* ``en_NG`` (English - Nigeria)
-* ``es`` (Spanish)
-* ``es_CO`` (Spanish - Colombia)
-* ``es_CR`` (Spanish - Costa Rica)
-* ``es_GT`` (Spanish - Guatemala)
-* ``es_VE`` (Spanish - Venezuela)
-* ``eu`` (EURO)
-* ``fa`` (Farsi)
-* ``fi`` (Finnish)
-* ``fr`` (French)
-* ``fr_BE`` (French - Belgium)
-* ``fr_CH`` (French - Switzerland)
-* ``fr_DZ`` (French - Algeria)
-* ``he`` (Hebrew)
-* ``hi`` (Hindi)
-* ``hu`` (Hungarian)
-* ``id`` (Indonesian)
-* ``is`` (Icelandic)
-* ``it`` (Italian)
-* ``ja`` (Japanese)
-* ``kn`` (Kannada)
-* ``ko`` (Korean)
-* ``kz`` (Kazakh)
-* ``lt`` (Lithuanian)
-* ``lv`` (Latvian)
-* ``nl`` (Dutch)
-* ``no`` (Norwegian)
-* ``pl`` (Polish)
-* ``pt`` (Portuguese)
-* ``pt_BR`` (Portuguese - Brazilian)
-* ``ro`` (Romanian)
-* ``ru`` (Russian)
-* ``sl`` (Slovene)
-* ``sk`` (Slovak)
-* ``sr`` (Serbian)
-* ``sv`` (Swedish)
-* ``te`` (Telugu)
-* ``tet`` (Tetum)
-* ``tg`` (Tajik)
-* ``tr`` (Turkish)
-* ``th`` (Thai)
-* ``uk`` (Ukrainian)
-* ``vi`` (Vietnamese)
+.. |docs| image:: https://readthedocs.org/projects/pypher/badge/?version=latest
+    :alt: Documentation Status
+    :scale: 100%
+    :target: https://pypher.readthedocs.org/en/latest/?badge=latest
 
-You can supply values like ``fr_FR``; if the country doesn't exist but the
-language does, the code will fall back to the base language (i.e. ``fr``). If
-you supply an unsupported language, ``NotImplementedError`` is raised.
-Therefore, if you want to call ``num2words`` with a fallback, you can do::
+.. |actions| image:: https://github.com/aboucaud/pypher/actions/workflows/pytest.yml/badge.svg
+    :alt: GitHub CI
+    :scale: 100%
+    :target: https://github.com/aboucaud/pypher/actions/workflows/pytest.yml
 
-    try:
-        return num2words(42, lang=mylang)
-    except NotImplementedError:
-        return num2words(42, lang='en')
+.. |license| image:: https://img.shields.io/badge/license-BSD-blue.svg?style=flat
+    :alt: License type
+    :scale: 100%
+    :target: https://github.com/aboucaud/pypher/blob/master/LICENSE
 
-Additionally, some converters and languages support other optional arguments
-that are needed to make the converter useful in practice.
+.. |doi| image:: https://zenodo.org/badge/21241/aboucaud/pypher.svg
+    :alt: DOI number
+    :scale: 100%
+    :target: https://zenodo.org/badge/latestdoi/21241/aboucaud/pypher
 
-Wiki
-----
-For additional information on some localization please check the Wiki_.
-And feel free to propose wiki enhancement.
+.. |arxiv| image:: http://img.shields.io/badge/arXiv-1609.02006-yellow.svg?style=flat
+     :alt: arXiv paper
+     :scale: 100%
+     :target: https://arxiv.org/abs/1609.02006
 
-.. _Wiki: https://github.com/savoirfairelinux/num2words/wiki
-
-History
--------
-
-``num2words`` is based on an old library, ``pynum2word``, created by Taro Ogawa
-in 2003. Unfortunately, the library stopped being maintained and the author
-can't be reached. There was another developer, Marius Grigaitis, who in 2011
-added Lithuanian support, but didn't take over maintenance of the project.
-
-I am thus basing myself on Marius Grigaitis' improvements and re-publishing
-``pynum2word`` as ``num2words``.
-
-Virgil Dupras, Savoir-faire Linux
