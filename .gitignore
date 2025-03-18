@@ -1,10 +1,17 @@
-_build
+# vim swap files
+*.swp
 
-build/
-dist/
-pypher.egg-info/
-
+# python bytecode files
 *.pyc
-__pycache__
+__pycache__/
 
-*.DS_Store
+# setuptools files
+*.egg-info/
+
+# testing files
+.tox/
+.coverage
+
+# files generated for release
+dist/
+README.rst
