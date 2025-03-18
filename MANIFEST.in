@@ -1,18 +1,10 @@
-include README.rst
 include LICENSE
-include CHANGELOG.md
+include documentation.ipynb
+include README.md
+include Makefile
+graft tests
+graft docs
+prune docs/build
 
-include docs/Makefile
-include docs/conf.py
-recursive-include docs *.rst
-
-exclude *.sh
-exclude .gitignore
-exclude Makefile
-exclude tox.ini
-exclude TODO
-exclude .pylintrc
-exclude .travis.yml
-
+global-exclude .ipynb_checkpoints
 global-exclude *.pyc
-global-exclude *.DS_Store

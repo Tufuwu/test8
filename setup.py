@@ -1,73 +1,38 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+from setuptools import setup
 
-# Copyright (c) 2015 IAS / CNRS / Univ. Paris-Sud
-# BSD License - see attached LICENSE file
-# Author: Alexandre Boucaud <alexandre.boucaud@ias.u-psud.fr>
-from setuptools import setup, find_packages
+from nbval._version import __version__
 
-
-def find_version(filepath):
-    """
-    Find project version in a given file
-
-    The syntax for the file version need to be in the form
-    __version__ = 'a.b.c'
-    which follows the semantic versioning http://semver.org/
-    * a : major version
-    * b : minor version
-    * c : patch version
-
-    Parameters
-    ----------
-    filepath: str
-        Path to the file containing a version number
-
-    Returns
-    -------
-    version: str
-        The program version in the form 'a.b.c' as described above
-
-    """
-    with open(filepath) as pfile:
-        for line in pfile.readlines():
-            if line.startswith('__version__'):
-                version = line.strip()[-6:-1]
-    return version
+with open('README.md') as f:
+    readme = f.read()
 
 setup(
-    name='pypher',
-    author='Alexandre Boucaud',
-    author_email='alexandre.boucaud@apc.in2p3.fr',
-    description='Python-based PSF Homogenization kERnels production',
-    license='New BSD',
-    url='http://pypher.readthedocs.org/en/latest/',
-    download_url='https://github.com/aboucaud/pypher',
-    version=find_version('pypher/pypher.py'),
-    long_description=open('README.rst').read(),
-    long_description_content_type='text/x-rst',
-    zip_safe=False,
-    packages=find_packages(),
-    include_package_data=True,
-    entry_points={
-        'console_scripts': [
-            'pypher = pypher.pypher:main',
-            'addpixscl = pypher.addpixscl:main',
-        ],
+    name="nbval",
+    version=__version__,
+    author="Laslett, Cortes, Fauske, Kluyver, Pepper, Fangohr",
+    description='A py.test plugin to validate Jupyter notebooks',
+    long_description=readme,
+    long_description_content_type="text/markdown",
+    packages = ['nbval'],
+    url='https://github.com/computationalmodelling/nbval',
+    # the following makes a plugin available to pytest
+    entry_points = {
+        'pytest11': [
+            'nbval = nbval.plugin',
+        ]
     },
-    install_requires=[
-        'numpy>=1.7.2',
-        'scipy>=0.9',
-        'astropy>=2.0'
+    install_requires = [
+        'pytest >= 7',
+        'jupyter_client',
+        'nbformat',
+        'ipykernel',
+        'coverage',
     ],
-    classifiers=[
-        'Programming Language :: Python',
-        'Development Status :: 4 - Beta',
+    python_requires='>=3.8, <4',
+    classifiers = [
+        'Framework :: IPython',
+        'Framework :: Pytest',
         'License :: OSI Approved :: BSD License',
-        'Intended Audience :: Science/Research',
-        'Topic :: Scientific/Engineering :: Astronomy',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-    ],
+        'Topic :: Software Development :: Testing',
+    ]
 )
