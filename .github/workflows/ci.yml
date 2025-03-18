@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', 'pypy3.7']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libexpat1-dev \
+          gettext \
+          liblcms2-dev \
+          libmagickwand-dev \
+          libopenexr-dev \
+          libcfitsio3-dev \
+          libfftw3-dev \
+          libgif-dev \
+          libgs-dev \
+          libgsf-1-dev \
+          libmatio-dev \
+          libopenslide-dev \
+          liborc-0.4-dev \
+          libpango1.0-dev \
+          libpoppler-glib-dev \
+          librsvg2-dev \
+          libwebp-dev \
+          libtiff5-dev \
+          libglib2.0-dev
+
+    - name: Cache VIPS
+      uses: actions/cache@v2
+      with:
+        path: ${{ github.workspace }}/vips
+        key: ${{ runner.os }}-vips
+
+    - name: Install VIPS
+      run: |
+        export VIPS_VERSION_MAJOR=8
+        export VIPS_VERSION_MINOR=9
+        export VIPS_VERSION_MICRO=0
+        bash install-vips.sh --without-python
+
+    - name: Configure environment
+      run: |
+        echo "VIPS_VERSION_MAJOR=8" >> $GITHUB_ENV
+        echo "VIPS_VERSION_MINOR=9" >> $GITHUB_ENV
+        echo "VIPS_VERSION_MICRO=0" >> $GITHUB_ENV
+        echo "${{ github.workspace }}/vips/bin" >> $GITHUB_PATH
+        echo "LD_LIBRARY_PATH=${{ github.workspace }}/vips/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+        echo "PKG_CONFIG_PATH=${{ github.workspace }}/vips/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+
+    - name: Upgrade setuptools
+      run: pip install -U setuptools
+
+    - name: Install dependencies
+      run: pip install -U .[test]
+
+    - name: Run tests
+      run: python setup.py test
