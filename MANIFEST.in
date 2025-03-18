@@ -1,5 +1,4 @@
-include checkQC/default_config/config.yaml
-include checkQC/default_config/logger.yaml
-include README.md
-include LICENSE
-recursive-exclude tests *
+include CHANGES.rst
+include COPYING
+include tests/*
+include bin/num2words
